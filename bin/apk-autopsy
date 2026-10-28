@@ -1,0 +1,63 @@
+#!/usr/bin/env bun
+// apk-autopsy CLI — bun bin/apk-autopsy <cmd> ...
+import { createAutopsy } from "../src/index";
+
+const [, , cmd, ...rest] = process.argv;
+const a = createAutopsy({ jobs: 4 });
+const flag = (name: string, dflt?: string) => {
+  const i = rest.indexOf(name);
+  return i >= 0 ? rest[i + 1] : dflt;
+};
+
+async function main() {
+  switch (cmd) {
+    case "tools": {
+      console.table(await a.tools());
+      return;
+    }
+    case "strings": {
+      const apk = rest[0];
+      const f = flag("-f");
+      const hits = await a.strings(apk, f ? new RegExp(f, "i") : undefined);
+      for (const h of hits) console.log(`[${h.dex}] 0x${h.offset.toString(16)} ${h.value}`);
+      console.error(`\n${hits.length} hits`);
+      return;
+    }
+    case "schema": {
+      const apk = rest[0];
+      const s = await a.schemaScan(apk);
+      console.log(`// CREATE TABLE (${s.createTables.length})`);
+      for (const t of s.createTables) console.log(t, "\n");
+      console.log(`// Room entities:`, s.roomEntities.join(", "));
+      console.log(`// db files:`, s.dbFiles.join(", "));
+      console.log(`// dataStore keys (${s.dataStoreKeys.length}):`, s.dataStoreKeys.join(", "));
+      console.log(`// domain strings (${s.domainStrings.length}):`);
+      for (const d of s.domainStrings.slice(0, 200)) console.log("  ", d);
+      return;
+    }
+    case "decompile": {
+      const apk = rest[0];
+      const dir = await a.decompile(apk, { dir: flag("-o"), deobf: !rest.includes("--no-deobf") });
+      console.log("decompiled →", dir);
+      return;
+    }
+    case "smali": {
+      const apk = rest[0];
+      const dir = await a.smali(apk, { dir: flag("-o") });
+      console.log("smali →", dir);
+      return;
+    }
+    case "grep": {
+      const dir = rest[0], pat = rest[1];
+      const hits = await a.grep(dir, new RegExp(pat, "i"));
+      for (const h of hits) console.log(`${h.file}:${h.line}: ${h.text}`);
+      console.error(`\n${hits.length} hits`);
+      return;
+    }
+    default:
+      console.error(`usage: apk-autopsy <tools|strings|schema|decompile|smali|grep> ...`);
+      process.exit(1);
+  }
+}
+
+main().catch((e) => { console.error("✘", e.message); process.exit(1); });

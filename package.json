@@ -1,0 +1,35 @@
+{
+  "name": "@android-fleet/apk-autopsy",
+  "version": "0.1.0",
+  "description": "Bun-first polyglot dex/APK autopsy: string mining, schema reverse (Room/DataStore/SQLite), jadx decompile, baksmali.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "bin": {
+    "apk-autopsy": "./bin/apk-autopsy"
+  },
+  "scripts": {
+    "smoke": "bun run bin/apk-autopsy tools && bun test test/",
+    "schema": "bun run bin/apk-autopsy schema"
+  },
+  "engines": {
+    "bun": ">=1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toxicwind/apk-autopsy.git"
+  },
+  "keywords": [
+    "android",
+    "dex",
+    "apk",
+    "jadx",
+    "baksmali",
+    "reverse-engineering",
+    "schema-reverse",
+    "room",
+    "datastore",
+    "bun"
+  ],
+  "license": "MIT"
+}
