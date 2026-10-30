@@ -1,4 +1,8 @@
 {
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "bun-types": "^1.4.4"
+  },
   "name": "@android-fleet/apk-autopsy",
   "version": "0.1.0",
   "description": "Bun-first polyglot dex/APK autopsy: string mining, schema reverse (Room/DataStore/SQLite), jadx decompile, baksmali.",
